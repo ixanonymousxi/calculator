@@ -48,7 +48,7 @@ function displayNums(){
     const operatorReg = /^(\+|-|\*|\/|)$/;
     let lastButtonPressed = display.textContent[display.textContent.length - 1];
 
-    if (display.textContent === "" && !operatorReg.test(this.innerText)) {
+    if (display.textContent === "" && this.innerText === "-" || display.textContent === "" && !operatorReg.test(this.innerText)) {
         display.textContent = display.textContent + this.innerText;
     } else if (display.textContent !== "" && !operatorReg.test(lastButtonPressed) && operatorReg.test(this.innerText) || !operatorReg.test(this.innerText)){
         display.textContent = display.textContent + this.innerText;
@@ -59,12 +59,25 @@ function equals(){
     const operatorReg = /(\+|-|\*|\/|\D)/;
     let equationArr = display.textContent.split(operatorReg);
 
-    //What's happening if the equation starts from a negative 
-    //then the operator array gets a NaN as it's first index
-    //gotta figure out a way to account for starting with negative numbers
+    //If equation only has the negative operator, remove and replace with 0
+    if (equationArr[0] === "" && equationArr[equationArr.length - 1] === "") {
+        equationArr = [0];
+    }
 
+    //If equation starts with a negative number adjust the first number to reflect that
+    if (equationArr[0] === ""){
+        equationArr[2] = parseInt(equationArr[1] + equationArr[2]);
+        equationArr.shift();
+        equationArr.shift();
+    }
 
-    //console.log(equationArr);
+    //If equation ends in an operator, remove it
+    if (equationArr[equationArr.length - 1] === "") {
+        equationArr.pop();
+        equationArr.pop();
+    }
+
+    //Make all numbers non-strings
     equationArr = equationArr.map(ele => {
         if(!operatorReg.test(ele)){
             return parseInt(ele);
@@ -73,12 +86,8 @@ function equals(){
         }
     });
 
-
-    const numArr = equationArr.filter(ele => !operatorReg.test(ele));
-    const opArr = equationArr.filter(ele => operatorReg.test(ele));
-
-    //console.log(numArr);
-    //console.log(opArr);
+    const numArr = equationArr.filter(ele => typeof ele === 'number');
+    const opArr = equationArr.filter(ele => typeof ele !== 'number');
 
     display.textContent = numArr.reduce((prev, cur, index) => {   
           return operate(prev, cur, opArr[index-1]);

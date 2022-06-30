@@ -57,26 +57,13 @@ function displayNums(){
     let lastButtonPressed = equation[equation.length - 1];
 
 
-    /*
-    let lastButtonPressed = display.textContent[display.textContent.length - 1];
-
-    
-    if (display.textContent === "" && this.innerText === "-" || display.textContent === "" && !operatorReg.test(this.innerText)) {
-        display.textContent = display.textContent + this.innerText;
-    } else if (display.textContent !== "" && !operatorReg.test(lastButtonPressed) && operatorReg.test(this.innerText) || !operatorReg.test(this.innerText)){
-        display.textContent = display.textContent + this.innerText;
-    }
-    */
-
-    //If number add to display, otherwise blink so the user knows an operator was pressed.
-    //console.log(val1);
     if (!operatorReg.test(this.innerText) && lastButtonPressed === "=") {
         blink();
         display.textContent = this.innerText;
     }else if (!operatorReg.test(this.innerText) && !operatorReg.test(lastButtonPressed)) {
         if(display.textContent === "0"){
             display.textContent = this.innerText;
-        }else{
+        }else if(display.textContent.length < 11){
             display.textContent = display.textContent + this.innerText;
         }
     }else if (!operatorReg.test(this.innerText) && operatorReg.test(lastButtonPressed)){
@@ -100,58 +87,39 @@ function displayNums(){
 
 function equals(){
 
+    const operatorReg = /^(\+|-|\*|\/|)$/;
+    let lastButtonPressed = equation[equation.length - 1];
+    let sum;
+
     blink();
 
-    display.textContent = operate(parseInt(val1),parseInt(display.textContent), operator);
+
+    if (!operator && !operatorReg.test(lastButtonPressed)){
+        display.textContent = display.textContent
+    }else{
+        if(operatorReg.test(lastButtonPressed)){
+            sum = operate(parseInt(display.textContent), parseInt(display.textContent), lastButtonPressed);
+        }else{
+            sum = operate(parseInt(val1), parseInt(display.textContent), operator);
+        }
+
+        //Makes sure the sum fits the display by cutting off the number.
+        const splitSum = String(sum).split('');
+
+        while(splitSum.length > 11){
+            splitSum.pop();
+        }
+
+        const joinedSum = splitSum.join('');
+
+
+        display.textContent = joinedSum;
+    }
+
     equation += "=";
     val1 = "0";
     operator = "";
 
-
-    /*
-    const operatorReg = /(\+|-|\*|\/|\D)/;
-    equationArr = equation.split(operatorReg);
-
-    console.log(equationArr);
-    */
-
-    /*
-    let equationArr = display.textContent.split(operatorReg);
-
-    //If equation only has the negative operator, remove and replace with 0
-    if (equationArr[0] === "" && equationArr[equationArr.length - 1] === "") {
-        equationArr = [0];
-    }
-
-    //If equation starts with a negative number adjust the first number to reflect that
-    if (equationArr[0] === ""){
-        equationArr[2] = parseInt(equationArr[1] + equationArr[2]);
-        equationArr.shift();
-        equationArr.shift();
-    }
-
-    //If equation ends in an operator, remove it
-    if (equationArr[equationArr.length - 1] === "") {
-        equationArr.pop();
-        equationArr.pop();
-    }
-
-    //Make all numbers non-strings
-    equationArr = equationArr.map(ele => {
-        if(!operatorReg.test(ele)){
-            return parseInt(ele);
-        }else{
-            return ele
-        }
-    });
-
-    const numArr = equationArr.filter(ele => typeof ele === 'number');
-    const opArr = equationArr.filter(ele => typeof ele !== 'number');
-
-    display.textContent = numArr.reduce((prev, cur, index) => {   
-          return operate(prev, cur, opArr[index-1]);
-    });
-    */
     
 }
 

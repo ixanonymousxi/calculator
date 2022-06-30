@@ -20,6 +20,7 @@
 
 #calculator{
     width:440px;
+    min-width:440px;
     height:75vh;
     padding: 10px;
     background:#0d9cb2;

@@ -1,4 +1,7 @@
 let display = document.querySelector(".display");
+let equation = "";
+let val1 = "0";
+let operator;
 
 function add(...args){
     return args.reduce((preVal, curVal) => {
@@ -44,19 +47,75 @@ function operate(num1,num2,operator){
     }
 }
 
+function blink(){
+    display.style.color = "white";
+    window.setTimeout(() => { display.style.color = "#042543"; }, 100);
+}
+
 function displayNums(){
     const operatorReg = /^(\+|-|\*|\/|)$/;
+    let lastButtonPressed = equation[equation.length - 1];
+
+
+    /*
     let lastButtonPressed = display.textContent[display.textContent.length - 1];
 
+    
     if (display.textContent === "" && this.innerText === "-" || display.textContent === "" && !operatorReg.test(this.innerText)) {
         display.textContent = display.textContent + this.innerText;
     } else if (display.textContent !== "" && !operatorReg.test(lastButtonPressed) && operatorReg.test(this.innerText) || !operatorReg.test(this.innerText)){
         display.textContent = display.textContent + this.innerText;
     }
+    */
+
+    //If number add to display, otherwise blink so the user knows an operator was pressed.
+    //console.log(val1);
+    if (!operatorReg.test(this.innerText) && lastButtonPressed === "=") {
+        blink();
+        display.textContent = this.innerText;
+    }else if (!operatorReg.test(this.innerText) && !operatorReg.test(lastButtonPressed)) {
+        if(display.textContent === "0"){
+            display.textContent = this.innerText;
+        }else{
+            display.textContent = display.textContent + this.innerText;
+        }
+    }else if (!operatorReg.test(this.innerText) && operatorReg.test(lastButtonPressed)){
+        val1 = display.textContent;
+        operator = lastButtonPressed;
+
+        blink();
+
+        display.textContent = this.innerText;
+    }else{
+        blink();
+
+        if (operator){
+            equals();
+        }
+    }
+
+    equation += this.innerText;
+
 }
 
 function equals(){
+
+    blink();
+
+    display.textContent = operate(parseInt(val1),parseInt(display.textContent), operator);
+    equation += "=";
+    val1 = "0";
+    operator = "";
+
+
+    /*
     const operatorReg = /(\+|-|\*|\/|\D)/;
+    equationArr = equation.split(operatorReg);
+
+    console.log(equationArr);
+    */
+
+    /*
     let equationArr = display.textContent.split(operatorReg);
 
     //If equation only has the negative operator, remove and replace with 0
@@ -92,11 +151,15 @@ function equals(){
     display.textContent = numArr.reduce((prev, cur, index) => {   
           return operate(prev, cur, opArr[index-1]);
     });
+    */
     
 }
 
 function clear(){
-    display.textContent = "";
+    display.textContent = "0";
+    equation = "";
+    val1 = "0";
+    operator = "";
 }
 
 document.querySelectorAll('button').forEach( button => {

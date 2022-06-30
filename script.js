@@ -56,27 +56,36 @@ function displayNums(){
     const operatorReg = /^(\+|-|\*|\/|)$/;
     let lastButtonPressed = equation[equation.length - 1];
 
+    blink();
 
+    //Starts a new equation after the user has hit equals.
+    //Clears display and then replaces with new number pressed by the user.
     if (!operatorReg.test(this.innerText) && lastButtonPressed === "=") {
-        blink();
         display.textContent = this.innerText;
-    }else if (!operatorReg.test(this.innerText) && !operatorReg.test(lastButtonPressed)) {
+    }
+    //When user presses a number adds the number to the display until a non-number key is pressed.
+    //Replaces the initial zero with chosen number
+    //Doesn't allow for numbers that are bigger than the display screen (11 digits long)
+    else if (!operatorReg.test(this.innerText) && !operatorReg.test(lastButtonPressed)) {
         if(display.textContent === "0"){
             display.textContent = this.innerText;
         }else if(display.textContent.length < 11){
             display.textContent = display.textContent + this.innerText;
         }
-    }else if (!operatorReg.test(this.innerText) && operatorReg.test(lastButtonPressed)){
+    }
+    //Stores first number user typed out as well as the operator
+    //Clears display and replaces it with next number being typed out.
+    else if (!operatorReg.test(this.innerText) && operatorReg.test(lastButtonPressed)){
         val1 = display.textContent;
         operator = lastButtonPressed;
 
-        blink();
-
         display.textContent = this.innerText;
-    }else{
-        blink();
-
-        if (operator){
+    }
+    //When user presses an operator button    
+    else{
+        //If previous operator has already been pressed, 
+        //then display the result before moving on to next operator.
+        if(operator){
             equals();
         }
     }
@@ -93,10 +102,11 @@ function equals(){
 
     blink();
 
-
+    //If user hits equals before choosing an operator then display current number
     if (!operator && !operatorReg.test(lastButtonPressed)){
         display.textContent = display.textContent
     }else{
+        //If user hasn't typed out a second number, uses the first number for both values
         if(operatorReg.test(lastButtonPressed)){
             sum = operate(parseInt(display.textContent), parseInt(display.textContent), lastButtonPressed);
         }else{

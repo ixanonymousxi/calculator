@@ -58,20 +58,16 @@ function displayNums(){
 
     blink();
 
-    //Starts a new equation after the user has hit equals.
+    //Starts a new equation 
+    //when the user has hit equals or when the screen displays initial zero
     //Clears display and then replaces with new number pressed by the user.
-    if (!operatorReg.test(this.innerText) && lastButtonPressed === "=") {
+    if (!operatorReg.test(this.innerText) && lastButtonPressed === "=" || !operatorReg.test(this.innerText) && display.textContent === "0") {
         display.textContent = this.innerText;
     }
-    //When user presses a number adds the number to the display until a non-number key is pressed.
-    //Replaces the initial zero with chosen number
+    //When user presses a number, adds the number to the display until a non-number key is pressed.
     //Doesn't allow for numbers that are bigger than the display screen (11 digits long)
-    else if (!operatorReg.test(this.innerText) && !operatorReg.test(lastButtonPressed)) {
-        if(display.textContent === "0"){
-            display.textContent = this.innerText;
-        }else if(display.textContent.length < 11){
-            display.textContent = display.textContent + this.innerText;
-        }
+    else if (!operatorReg.test(this.innerText) && !operatorReg.test(lastButtonPressed) && display.textContent.length < 11) {
+        display.textContent = display.textContent + this.innerText;
     }
     //Stores first number user typed out as well as the operator
     //Clears display and replaces it with next number being typed out.

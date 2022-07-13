@@ -26,7 +26,7 @@
     background:#0d9cb2;
     display:grid;
     grid-template-columns: 25% 25% 25% 25%;
-    grid-template-rows: 20% 20% 20% 20% 20%;
+    grid-template-rows: 20% 16% 16% 16% 16% 16%;
 }
 
 button{
@@ -69,8 +69,18 @@ button{
     background:#f3b195;
 }
 
+.equals{
+    grid-column-start: 1;
+    grid-column-end: 4;
+}
+
 .equals button{
-    background:#fbcf6e;
+    background:#a1cbd4;
+    width:95%;
+}
+
+.delete button {
+    background: #ffe599;
 }
 
 .operators button{

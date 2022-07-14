@@ -1,4 +1,4 @@
-let display = document.querySelector(".display");
+const display = document.querySelector(".display");
 let equation = "";
 let val1 = "0";
 let operator;
@@ -61,13 +61,25 @@ function displayNums(){
     //Starts a new equation 
     //when the user has hit equals or when the screen displays initial zero
     //Clears display and then replaces with new number pressed by the user.
-    if (!operatorReg.test(this.innerText) && lastButtonPressed === "=" || !operatorReg.test(this.innerText) && display.textContent === "0") {
-        display.textContent = this.innerText;
+    if (!operatorReg.test(this.innerText) && lastButtonPressed === "=" || !operatorReg.test(this.innerText) && equation === "") {
+        
+        //If decimal is pressed add a 0 and disable decimal button
+        if (this.innerText === ".") {
+            display.textContent = "0" + this.innerText;
+            document.querySelector('#decimal button').removeEventListener('click', displayNums);
+        }else{
+            display.textContent = this.innerText;
+        }
     }
     //When user presses a number, adds the number to the display until a non-number key is pressed.
     //Doesn't allow for numbers that are bigger than the display screen (11 digits long)
     else if (!operatorReg.test(this.innerText) && !operatorReg.test(lastButtonPressed) && display.textContent.length < 11) {
         display.textContent = display.textContent + this.innerText;
+
+        //If decimal is pressed disable button
+        if (this.innerText === ".") {
+            document.querySelector('#decimal button').removeEventListener('click', displayNums);
+        }
     }
     //Stores first number user typed out as well as the operator
     //Clears display and replaces it with next number being typed out.
@@ -75,10 +87,19 @@ function displayNums(){
         val1 = display.textContent;
         operator = lastButtonPressed;
 
-        display.textContent = this.innerText;
+        //If decimal is pressed add a 0 and disable decimal button
+        if (this.innerText === ".") {
+            display.textContent = "0" + this.innerText;
+            document.querySelector('#decimal button').removeEventListener('click', displayNums);
+        } else {
+            display.textContent = this.innerText;
+        }
     }
     //When user presses an operator button    
     else{
+        //Reenable decimal button for next number
+        document.querySelector('#decimal button').addEventListener('click', displayNums);
+
         //If previous operator has already been pressed, 
         //then display the result before moving on to next operator.
         if(operator){
@@ -104,9 +125,9 @@ function equals(){
     }else{
         //If user hasn't typed out a second number, uses the first number for both values
         if(operatorReg.test(lastButtonPressed)){
-            sum = operate(parseInt(display.textContent), parseInt(display.textContent), lastButtonPressed);
+            sum = operate(parseFloat(display.textContent), parseFloat(display.textContent), lastButtonPressed);
         }else{
-            sum = operate(parseInt(val1), parseInt(display.textContent), operator);
+            sum = operate(parseFloat(val1), parseFloat(display.textContent), operator);
         }
 
         //Makes sure the sum fits the display by cutting off the number.
@@ -126,6 +147,8 @@ function equals(){
     val1 = "0";
     operator = "";
 
+    document.querySelector('#decimal button').addEventListener('click', displayNums);
+
     
 }
 
@@ -136,12 +159,45 @@ function clear(){
     operator = "";
 }
 
-document.querySelectorAll('button').forEach( button => {
-    if (button.innerText !== "=" && button.innerText !== "C"){
-        button.addEventListener('click', displayNums);
-    }else if (button.innerText === "C"){
-        button.addEventListener('click', clear);
+function backspace(){
+    const operatorReg = /^(\+|-|\*|\/|)$/;
+    let lastButtonPressed = equation[equation.length - 1];
+
+    let equationArr = equation.split('');
+    equationArr.pop();
+
+    let displayArr = display.textContent.split('');
+    displayArr.pop('');
+
+
+    blink();
+
+    if (operatorReg.test(lastButtonPressed)){
+        equation = equationArr.join('');
+        operator = "";
     }else{
-        button.addEventListener('click', equals);
+
+        if (lastButtonPressed === ".") {
+            document.querySelector('#decimal button').addEventListener('click', displayNums);
+        }
+        display.textContent = displayArr.join('') ? displayArr.join('') : '0';
+        equation = equationArr.join('');
     }
+
+
+}
+
+document.querySelectorAll('button').forEach( button => {
+
+    if (button.innerText === "C") {
+        button.addEventListener('click', clear);
+    }else if (button.innerText === "CE") {
+        button.addEventListener('click', backspace);
+    }else if (button.innerText === "=") {
+        button.addEventListener('click', equals);
+    }else{
+        button.addEventListener('click', displayNums);
+    }
+
+
 });

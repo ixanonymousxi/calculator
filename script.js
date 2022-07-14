@@ -1,4 +1,5 @@
 const display = document.querySelector(".display");
+const operatorReg = /^(\+|-|\*|\/|)$/;
 let equation = "";
 let val1 = "0";
 let operator;
@@ -53,46 +54,51 @@ function blink(){
 }
 
 function displayNums(){
-    const operatorReg = /^(\+|-|\*|\/|)$/;
-    let lastButtonPressed = equation[equation.length - 1];
+    const lastButtonPressed = equation[equation.length - 1];
+    const currentButtonPressed = this.innerText;
+    const isCurrentButtonOperator = operatorReg.test(currentButtonPressed);
+    const isLastButtonOperator = operatorReg.test(lastButtonPressed);
 
     blink();
+
+
+    //console.log(lastButtonPressed);
 
     //Starts a new equation 
     //when the user has hit equals or when the screen displays initial zero
     //Clears display and then replaces with new number pressed by the user.
-    if (!operatorReg.test(this.innerText) && lastButtonPressed === "=" || !operatorReg.test(this.innerText) && equation === "") {
+    if (!isCurrentButtonOperator && lastButtonPressed === "=" || !isCurrentButtonOperator && equation === "") {
         
         //If decimal is pressed add a 0 and disable decimal button
-        if (this.innerText === ".") {
-            display.textContent = "0" + this.innerText;
+        if (currentButtonPressed === ".") {
+            display.textContent = "0" + currentButtonPressed;
             document.querySelector('#decimal button').removeEventListener('click', displayNums);
         }else{
-            display.textContent = this.innerText;
+            display.textContent = currentButtonPressed;
         }
     }
     //When user presses a number, adds the number to the display until a non-number key is pressed.
     //Doesn't allow for numbers that are bigger than the display screen (11 digits long)
-    else if (!operatorReg.test(this.innerText) && !operatorReg.test(lastButtonPressed) && display.textContent.length < 11) {
-        display.textContent = display.textContent + this.innerText;
+    else if (!isCurrentButtonOperator && !isLastButtonOperator && display.textContent.length < 11) {
+        display.textContent = display.textContent + currentButtonPressed;
 
         //If decimal is pressed disable button
-        if (this.innerText === ".") {
+        if (currentButtonPressed === ".") {
             document.querySelector('#decimal button').removeEventListener('click', displayNums);
         }
     }
     //Stores first number user typed out as well as the operator
     //Clears display and replaces it with next number being typed out.
-    else if (!operatorReg.test(this.innerText) && operatorReg.test(lastButtonPressed)){
+    else if (!isCurrentButtonOperator && isLastButtonOperator){
         val1 = display.textContent;
         operator = lastButtonPressed;
 
-        //If decimal is pressed add a 0 and disable decimal button
-        if (this.innerText === ".") {
-            display.textContent = "0" + this.innerText;
+        //If decimal is pressed add a 0 and disable decimal button. Otherwise display new number.
+        if (currentButtonPressed === ".") {
+            display.textContent = "0" + currentButtonPressed;
             document.querySelector('#decimal button').removeEventListener('click', displayNums);
         } else {
-            display.textContent = this.innerText;
+            display.textContent = currentButtonPressed;
         }
     }
     //When user presses an operator button    
@@ -107,24 +113,25 @@ function displayNums(){
         }
     }
 
-    equation += this.innerText;
+    equation += currentButtonPressed;
 
 }
 
 function equals(){
 
-    const operatorReg = /^(\+|-|\*|\/|)$/;
-    let lastButtonPressed = equation[equation.length - 1];
+    const lastButtonPressed = equation[equation.length - 1];
+    const isLastButtonOperator = operatorReg.test(lastButtonPressed);
+
     let sum;
 
     blink();
 
     //If user hits equals before choosing an operator then display current number
-    if (!operator && !operatorReg.test(lastButtonPressed)){
-        display.textContent = display.textContent
+    if (!operator && !isLastButtonOperator){
+        display.textContent = display.textContent;
     }else{
         //If user hasn't typed out a second number, uses the first number for both values
-        if(operatorReg.test(lastButtonPressed)){
+        if (isLastButtonOperator){
             sum = operate(parseFloat(display.textContent), parseFloat(display.textContent), lastButtonPressed);
         }else{
             sum = operate(parseFloat(val1), parseFloat(display.textContent), operator);
@@ -160,28 +167,34 @@ function clear(){
 }
 
 function backspace(){
-    const operatorReg = /^(\+|-|\*|\/|)$/;
-    let lastButtonPressed = equation[equation.length - 1];
+    const lastButtonPressed = equation[equation.length - 1];
+    const isLastButtonOperator = operatorReg.test(lastButtonPressed);
 
     let equationArr = equation.split('');
-    equationArr.pop();
+    equationArr.pop()
+    let backSpacedEquation = equationArr.join('');
 
     let displayArr = display.textContent.split('');
     displayArr.pop('');
-
+    let backSpacedDisplay = displayArr.join('');
 
     blink();
 
-    if (operatorReg.test(lastButtonPressed)){
-        equation = equationArr.join('');
+    if (isLastButtonOperator){
+        equation = backSpacedEquation;
         operator = "";
-    }else{
-
-        if (lastButtonPressed === ".") {
+    } 
+    //If deleting a decimal, reenable the decimal button.
+    else if (lastButtonPressed === ".") {
             document.querySelector('#decimal button').addEventListener('click', displayNums);
-        }
-        display.textContent = displayArr.join('') ? displayArr.join('') : '0';
-        equation = equationArr.join('');
+    } 
+    //If backspacing creates an empty display then start display back at '0'.
+    else if (!backSpacedDisplay){
+        display.textContent = '0';
+    }
+    else{
+        display.textContent = backSpacedDisplay;
+        equation = backSpacedEquation;
     }
 
 
@@ -198,6 +211,5 @@ document.querySelectorAll('button').forEach( button => {
     }else{
         button.addEventListener('click', displayNums);
     }
-
 
 });

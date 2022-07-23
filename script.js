@@ -123,6 +123,7 @@ function equals(){
     const isLastButtonOperator = operatorReg.test(lastButtonPressed);
 
     let sum;
+    let result;
 
     blink();
 
@@ -137,17 +138,22 @@ function equals(){
             sum = operate(parseFloat(val1), parseFloat(display.textContent), operator);
         }
 
+        
         //Makes sure the sum fits the display by cutting off the number.
         const splitSum = String(sum).split('');
+        let numBeforeDecimal = 1;
 
-        while(splitSum.length > 11){
-            splitSum.pop();
+        for(let i = 0; i < splitSum.length; i++){
+            if (splitSum[i] === "."){
+                break;
+            }
+
+            numBeforeDecimal++;
         }
 
-        const joinedSum = splitSum.join('');
+        result = roundAccurately(sum, (11 - numBeforeDecimal));
+        display.textContent = result;
 
-
-        display.textContent = joinedSum;
     }
 
     equation += "=";
@@ -198,6 +204,10 @@ function backspace(){
     }
 
 
+}
+
+function roundAccurately(num, places) {
+    return parseFloat(Math.round(num + 'e' + places) + 'e-' + places);
 }
 
 document.querySelectorAll('button').forEach( button => {
